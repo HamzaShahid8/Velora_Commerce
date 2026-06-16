@@ -1,15 +1,20 @@
 {
   "version": 2,
-  "buildCommand": "cd Velora && python manage.py collectstatic --noinput",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.py"
+      "src": "index.py",
+      "use": "@vercel/python"
     }
   ],
-  "functions": {
-    "api/index.py": {
-      "excludeFiles": "{.venv/**,venv/**,__pycache__/**,**/*.pyc,media/**,staticfiles/**,db.sqlite3,.env}"
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/Velora/staticfiles/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.py"
     }
-  }
+  ],
+  "buildCommand": "cd Velora && python manage.py collectstatic --noinput"
 }
