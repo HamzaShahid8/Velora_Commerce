@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd Velora && python manage.py collectstatic --noinput",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.py"
+    }
+  ],
+  "functions": {
+    "index.py": {
+      "excludeFiles": "{.venv/**,venv/**,__pycache__/**,**/*.pyc,media/**,staticfiles/**,db.sqlite3,.env}"
+    }
+  }
+}
