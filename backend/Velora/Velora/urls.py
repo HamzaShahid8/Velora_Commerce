@@ -18,11 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
-
-def home(request):
-    return HttpResponse('Welcome to the Velora backend')
 
 from drf_spectacular.views import (
     SpectacularAPIView,
