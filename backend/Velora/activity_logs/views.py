@@ -8,5 +8,5 @@ from rest_framework.permissions import IsAuthenticated
 
 class ActivityLogViewSet(viewsets.ModelViewSet):
     queryset = ActivityLog.objects.all()
-    serializer_class = [ActivityLogSerializer]
+    serializer_class = ActivityLogSerializer
     permission_classes = [IsAuthenticated]
