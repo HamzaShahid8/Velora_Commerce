@@ -21,6 +21,7 @@ from activity_logs.models import *
 from activity_logs.utils import *
 from activity_logs.serializers import *
 from activity_logs.views import *
+from django.db import connection
 
 # Create your views here.
 
@@ -236,3 +237,22 @@ class Dashboard(APIView):
             'email': request.user.email,
             'role': request.user.role.name
         })
+        
+        
+class HealthyCheckView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            connection.ensure_connection()
+            return JsonResponse({
+                'status': 'healthy',
+                'database': 'connected'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'unhealthy',
+                'database': 'no connected',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

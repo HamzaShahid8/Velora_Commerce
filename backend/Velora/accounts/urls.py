@@ -13,4 +13,5 @@ urlpatterns = [
     path('otp_generate/', GenerateOTPView.as_view(), name = 'generate_otp'),
     path('verify_otp/', VerifyOTPView.as_view(), name = 'verify_otp'),
     path('task_status/', TaskStatusView.as_view(), name = 'task_status'),
+    path('health-check/', HealthyCheckView.as_view(), name = 'health-check'),
 ]
