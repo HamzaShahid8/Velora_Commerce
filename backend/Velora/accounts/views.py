@@ -22,6 +22,8 @@ from activity_logs.utils import *
 from activity_logs.serializers import *
 from activity_logs.views import *
 from django.db import connection
+from django.core.cache import cache
+from celery import current_app
 
 # Create your views here.
 
@@ -243,16 +245,42 @@ class HealthyCheckView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
+        
+        health = {
+            'status': 'healthy',
+            'database': 'connected',
+            'redis': 'connected',
+            'celery': 'running',
+        }
+        
+        status_code = status.HTTP_200_OK
+        
+        # database
         try:
             connection.ensure_connection()
-            return JsonResponse({
-                'status': 'healthy',
-                'database': 'connected'
-            }, status=status.HTTP_200_OK)
             
         except Exception as e:
-            return JsonResponse({
-                'status': 'unhealthy',
-                'database': 'no connected',
-                'error': str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            health['status'] = 'unhealthy'
+            health['database'] = str(e)
+            
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            
+        # redis
+        try:
+            cache.set('health_check', 'ok', timeout=10)
+            cache.get('health_check')
+            
+        except Exception as e:
+            health['status'] = 'unhealthy'
+            health['redis'] = str(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            
+        # celery
+        try:
+            current_app.control.ping(timeout=10)
+        except Exception as e:
+            health['status'] = 'unhealthy'
+            health['celery'] = str(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            
+        return Response(health, status=status_code)
